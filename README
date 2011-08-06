@@ -25,13 +25,13 @@ These instructions assume that you have already defined and tested a simple Pyth
 
 Step 1: Configure the app.yaml file, install static files, and test the site.
 
-app.yaml
+https://github.com/paca-project/gae-for-vishnevskiy-battlenet/blob/master/app.yaml
 You'll obviously have to change the "application" name at the top to match the name of your application. In addition to the test.* handler there are handlers for static files and docs. The last three handlers are not strictly necessary but I have them so that static files (images, css files, etc.) can be easily added to the site and API docs can be easily made available on the site.
 
-redirect-docs.py
+https://github.com/paca-project/gae-for-vishnevskiy-battlenet/blob/master/redirect-docs.py
 Redirects people who access /docs to /docs/ so that they can get to the documentation
 
-static.zip
+https://github.com/paca-project/gae-for-vishnevskiy-battlenet/blob/master/static.zip
 Provides the index.html and any other static files you want to deliver
 
 
