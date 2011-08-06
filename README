@@ -1,0 +1,121 @@
+These instructions are written for someone who has already deployed a simple Google App Engine site using Python. If you don't know how to do that don't worry it's easy and you will be able to figure it out quickly.
+
+There are five components. While you only need a Google App Engine account and vishnevskiy's Python Library (1, 2) for a minimalist configuration it is highly recommended that you download the additional libraries and unit testing frameworks (3, 4) and Blizzard's API docs (5). A complete installation will make it much easier to test the library and your own code.
+
+
+1. A Google App Engine (GAE) account and Python driven site:
+http://code.google.com/appengine/docs/python/gettingstarted/helloworld.html
+
+2. vishnevskiy's Python Library for Blizzard's Community Platform API:
+https://github.com/vishnevskiy/battlenet
+
+3. A library that provides functions that vishnevskiy uses:
+http://pypi.python.org/packages/source/u/unittest2/
+
+4. The unit testing framework for Google App Engine
+http://code.google.com/p/gaeunit/
+
+5. The published API docs from Blizzard (optional, but I like to add it)
+https://github.com/Blizzard/api-wow-docs/
+
+
+These instructions assume that you have already defined and tested a simple Python driven Google App Engine site and that you have changed into that directory to run the following commands.
+
+
+
+Step 1: Configure the app.yaml file, install static files, and test the site.
+
+app.yaml
+You'll obviously have to change the "application" name at the top to match the name of your application. In addition to the test.* handler there are handlers for static files and docs. The last three handlers are not strictly necessary but I have them so that static files (images, css files, etc.) can be easily added to the site and API docs can be easily made available on the site.
+
+redirect-docs.py
+Redirects people who access /docs to /docs/ so that they can get to the documentation
+
+static.zip
+Provides the index.html and any other static files you want to deliver
+
+
+Deploy the site now and verify that the index.html in static/ is being delivered.
+
+
+
+Step 2: Download and unpack the latest version of the library from vishnevskiy:
+wget https://github.com/vishnevskiy/battlenet/tarball/master --no-check-certificate
+tar zxf master
+mv vishnevskiy-battlenet-* vishnevskiy-battlenet
+mv master vishnevskiy-battlenet.tar.gz
+
+
+## Make the test directory that the GAE Unit Testing framework will send requests to
+mkdir -p ./test/
+cd ./test
+
+## Move the tests from vishnevskiy's library into this directory so the GAE
+## can find them and then do the same for the library itself.
+mv ../vishnevskiy-battlenet/tests/test_*.py .
+mv ../vishnevskiy-battlenet/battlenet .
+cd ..
+
+## Remove the stripped out directory, the fewer files the better when uploading to GAE
+rm -rf ./vishnevskiy-battlenet
+
+
+
+Step 3: Download unittest2 and put it somewhere that the GAE code will easily find it
+cd ./test/
+
+wget http://pypi.python.org/packages/source/u/unittest2/unittest2-0.5.1.tar.gz
+tar zxf unittest2-*.tar.gz
+rm unittest2-*.tar.gz
+
+## The library itself is in a subdir of the unpacked directory, so use a sym link
+## to make that directory visible at the top level of the GAE app so it's easy
+## to access.
+ln -s unittest2-*/unittest2 unittest2
+cd ..
+
+
+
+Step 4: Download and install the Google App Engine unit testing framework
+wget http://gaeunit.googlecode.com/files/gaeunit-1.2.8.zip
+unzip gaeunit-1.2.8.zip
+cp gaeunit-1.2.8/gaeunit.py .
+
+## Remove the unpacked directory, the fewer files the better when uploading to GAE.
+rm -rf gaeunit-1.2.8/
+
+
+
+
+Deploy the site!
+You should now have a working unit test available on your Google App Engine site.
+Note the lack of a trailing "/", on the URL, that's important.
+
+
+Optional step: Adding Blizzard's latest API docs to the site.
+## Change into the Google App Engine site directory (the one with app.yaml in it)
+
+## Download the most recent version of the docs.
+wget https://github.com/Blizzard/api-wow-docs/tarball/master --no-check-certificate
+tar zxf master
+rm master
+
+cd Blizzard-api-wow-docs-*/
+xmllint --xinclude docbook.xml > docbook-new.xml
+xsltproc --stringparam html.stylesheet "style.css" \
+  api-wow.xsl docbook-new.xml > index.html
+mkdir ../static/docs/
+mv *.json ../static/docs/
+mv *.html ../static/docs/
+mv *.css ../static/docs
+cd ..
+
+## Be sure to remove the doc components otherwise the GAE site may not upload
+rm -rf Blizzard-api-wow-docs-*
+
+
+
+Deploy!
+This may take a little while to copy all the data up to the Google App Engine site.
+Be patient, when it's done you should have a Google App Engine complete with unit tests, documentation and everything you need to make use of Blizzard's Community Platform API.
+
