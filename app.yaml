@@ -1,0 +1,20 @@
+application: wow-community-api-example
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+
+- url: /test.*
+  script: gaeunit.py
+
+- url: (.*)/
+  static_files: static\1/index.html
+  upload: static/index.html
+
+- url: /docs
+  script: redirect-docs.py
+
+- url: /
+  static_dir: static
+
